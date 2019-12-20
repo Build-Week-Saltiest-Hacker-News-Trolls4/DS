@@ -45,5 +45,12 @@ class User():
         return dummy_comment   
 
     def push_heroku():
+        # MARTIN
+        # Push to backend
+
+        push_chart_to_Postgres()
+
+
+        return True
         
 
