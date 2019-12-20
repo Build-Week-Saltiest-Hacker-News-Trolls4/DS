@@ -1,7 +1,7 @@
 import pandas as pd
 from datetime import datetime
 from sentiment_model import score_sentiment
-from get_user_posts import get_user_posts
+from hacker_access import get_user_posts
 
 class User():
 
@@ -19,6 +19,7 @@ class User():
         """Returns pandas dataframe {'comment_id', 'text'} with id > last_loaded_comment"""
         ids, posts = get_user_posts(username, limit=20)
         comments_df = pd.DataFrame(list(zip(ids, posts)))
+        
         # Dummy return
         # dummy_df = pd.DataFrame([[0,'dummy text', 0]], columns=self.cols)
         return comments_df
