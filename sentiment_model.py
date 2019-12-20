@@ -14,3 +14,5 @@ def score_sentiment(text):
                 total_sentiment += sentence.sentiment.polarity
         avg_sentiment = total_sentiment/len(blob.sentences)
         return total_sentiment, avg_sentiment
+
+#Test commit (DeleteME)
