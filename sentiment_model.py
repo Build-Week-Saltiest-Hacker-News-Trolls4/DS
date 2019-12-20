@@ -15,8 +15,3 @@ def score_sentiment(text):
         avg_sentiment = total_sentiment/len(blob.sentences)
         return total_sentiment, avg_sentiment
 
-<<<<<<< HEAD
-        # my comment > your comment
-=======
-#Test commit (DeleteME)
->>>>>>> 15be4bdabfd9c0942274536d9b703e61e278ca8f
