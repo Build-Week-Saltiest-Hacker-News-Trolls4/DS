@@ -38,9 +38,13 @@ class User():
         self.mean_sentiment = self.scored_comments['sentiment'].mean()
 
     def get_saltiest_comment(self):
-        """return comment with min sentiment"""
+        """return comment with min sentiment as a dictionary"""
         # TODO: Implement, builds off get_new_comments
 
-        # Dummy return
-        dummy_comment = [0, 'dummy saltiest text', 0]
-        return dummy_comment
+        # Dummy return values
+        id = 0
+        text = 'dummy saltiest text'
+        score = 0.0
+
+        slatiest_comment = {'id' : id, 'text' : text, 'score' : score}
+        return slatiest_comment
