@@ -3,10 +3,20 @@ import requests
 
 
 def get_user_posts(username, filter_posts="all", limit=100):
-    """
-    Filter by type of item. 
-    One of "job", "story", "comment", "poll", or "pollopt"
-    Default: type='comment', limit='100'
+    """ 
+    Filter user posts by type of item.
+  
+    Current implimentation only works for 'comments'
+  
+    Parameters: 
+    username (str): Username for which to return posts.
+    filter_posts (str): Type of posts to return ("job", "story", "comment", "poll", or "pollopt").
+    limit (int): The maximum number of posts to return
+  
+    Returns: 
+    filtered_post_ids (list<int>): Filtered post ids as a list of integers.
+    filtered_posts (list<str>): Filtered post ids as a list of strings.
+  
     """
     # TODO: currently only supports 'comment' type
 
