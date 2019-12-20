@@ -2,11 +2,11 @@ import json
 import requests
 
 
-def get_user_posts(username, filter_posts="all", limit=100):
+def get_user_posts(username, filter_posts="comment", limit=100):
     """ 
     Filter user posts by type of item.
   
-    Current implimentation only works for 'comments'
+    Current implimentation only works for 'comment'
   
     Parameters: 
     username (str): Username for which to return posts.
