@@ -1,7 +1,7 @@
 import pandas as pd
 from datetime import datetime
 from .sentiment_model import score_sentiment
-import .get_user_posts
+from .get_user_posts import get_user_posts
 
 
 class User():
@@ -45,6 +45,9 @@ class User():
         return dummy_comment   
 
     def push_heroku():
+<<<<<<< HEAD
+
+=======
         # MARTIN
         # Push to backend
 
@@ -53,4 +56,5 @@ class User():
 
         return True
         
+>>>>>>> 3a93eaf985731ee3a4edbc6c6ec412d28e4ff2fc
 
