@@ -1,6 +1,8 @@
 import pandas as pd
 from datetime import datetime
 from .sentiment_model import score_sentiment
+import .get_user_posts
+
 
 class User():
     def __init__(self, username):
@@ -35,11 +37,13 @@ class User():
 
 
     def get_saltiest_comment(self):
-        """return comment with min sentiment"""
+        #return comment with min sentiment
         # TODO: Implement
 
         # Dummy return
         dummy_comment = [0, 'dummy saltiest text', 0]
-        return dummy_comment
-    
+        return dummy_comment   
+
+    def push_heroku():
+        
 
