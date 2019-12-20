@@ -2,6 +2,10 @@ import pandas as pd
 from datetime import datetime
 from .sentiment_model import score_sentiment
 from .get_user_posts import get_user_posts
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5ee76c1332964ca6aabe37ada01b7d0901aaefa3
 
 class User():
 
@@ -37,11 +41,29 @@ class User():
         self.mean_sentiment = self.scored_comments['sentiment'].mean()
 
     def get_saltiest_comment(self):
+<<<<<<< HEAD
         """return comment with min sentiment"""
         # TODO: Implement, builds off get_new_comments
+=======
+        #return comment with min sentiment
+        # TODO: Implement
+>>>>>>> 5ee76c1332964ca6aabe37ada01b7d0901aaefa3
 
         # Dummy return
         dummy_comment = [0, 'dummy saltiest text', 0]
-        return dummy_comment
-    
+        return dummy_comment   
+
+    def push_heroku():
+<<<<<<< HEAD
+
+=======
+        # MARTIN
+        # Push to backend
+
+        push_chart_to_Postgres()
+
+
+        return True
+        
+>>>>>>> 3a93eaf985731ee3a4edbc6c6ec412d28e4ff2fc
 
