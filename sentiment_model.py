@@ -23,6 +23,6 @@ def score_sentiment(text):
         #Print polarity of each sentence
         total_sentiment = 0
         for sentence in blob.sentences:
-                total_sentiment += sentence.sentiment.polary
+                total_sentiment += sentence.sentiment.polarity
         avg_sentiment = total_sentiment/len(blob.sentences)
         return total_sentiment, avg_sentiment
