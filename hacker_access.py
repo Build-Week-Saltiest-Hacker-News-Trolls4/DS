@@ -19,6 +19,8 @@ def get_user_posts(username, filter_posts="comment", limit=100):
   
     """
     # TODO: currently only supports 'comment' type
+    # TODO: handle case where user posts so many stories that it causes timeout
+    # TODO: Currently ingests 'title' of 'story', decide whether that should stay
 
     response = requests.get(f'https://hacker-news.firebaseio.com/v0/user/{username}.json')
     post_ids = response.json()["submitted"]
@@ -27,19 +29,23 @@ def get_user_posts(username, filter_posts="comment", limit=100):
     filtered_posts = []
    
     for post_id in post_ids:
-        
-        # post is a python dict
+        # This should be a function extract_text()
+        # Post is a python dict
         post = requests.get(f'https://hacker-news.firebaseio.com/v0/item/{post_id}.json').json()
-
         if (post['type'] == filter_posts):
-            
             text = post.get('text')   
             
             # text==null if post was deleted
             if text:
                 filtered_posts.append(text)
                 filtered_post_ids.append(post_id)
-        
+        elif (post['type'] == 'story'):
+            text = post.get('title')
+
+            if text:
+                filtered_posts.append(text)
+                filtered_post_ids.append(post_id)
+
         # Checks whether the specified limit has been reached
         if len(filtered_posts) == limit:
             break
@@ -57,7 +63,7 @@ def get_user_list(criteria='top100'):
                         7.	rayiner	sd
                         8.	ChuckMcM	sd
                         9.	rbanffy	sd
-                        10.	prostoalex11.	sd
+                        10.	prostoalex	sd
                         11. Animats	79907
                         12.	mikeash	74346
                         13.	edw519	73178

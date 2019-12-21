@@ -15,6 +15,7 @@ class User():
         self.last_update = datetime.now()
         self.latest_comment_id = self.scored_comments.tail(1)['comment_id']
         self.mean_sentiment = 0
+        print(f'Debug: initialization of {username} completed.') # Debug use. delete.
 
     def get_new_comments(self, username, last_loaded_comment=0):
         """Returns pandas dataframe {'comment_id', 'text'} with id > last_loaded_comment"""

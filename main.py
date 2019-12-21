@@ -3,16 +3,15 @@ import hacker_access
 import pandas as pd
 from hacker_user import User
 
-users_usernames = hacker_access.get_user_list()
-
+users_usernames = hacker_access.get_user_list() # [:5] if for dubug use only
+# print(users_usernames[0:10])
 observations = []
 
-for username in users_usernames:
+for username in users_usernames[0:]:
 
     print('Loading user: ', username) # Debug use only, delete.
 
     user = User(username)
-    user.update_sentiment() # Consider calling as part of __init__
 
     mean_sentiment = user.mean_sentiment
     saltiest_comment = user.get_saltiest_comment()
