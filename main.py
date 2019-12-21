@@ -3,18 +3,13 @@ import hacker_access
 import pandas as pd
 from hacker_user import User
 
-top_users_usernames = hacker_access.get_user_list()
+users_usernames = hacker_access.get_user_list()
 
 observations = []
 
-# Build top n users table
-# Debug: takes forever
-# for username in top_users_usernames:
+for username in users_usernames:
 
-for username in top_users_usernames:
-
-    # Debug
-    print('Loading user: ', username)
+    print('Loading user: ', username) # Debug use only, delete.
 
     user = User(username)
     user.update_sentiment() # Consider calling as part of __init__
@@ -28,10 +23,9 @@ for username in top_users_usernames:
 headers = ['score', 'username', 
         'saltiest_comment_text', 'saltiest_comment_id']
 
-top_users_report = pd.DataFrame(observations, columns=headers)
+users_report = pd.DataFrame(observations, columns=headers)
 
-print('works till here')
-print(top_users_report)
+print(users_report) # Debug use only, delete.
 
 
 
