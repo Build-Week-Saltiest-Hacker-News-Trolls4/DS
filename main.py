@@ -24,6 +24,7 @@ headers = ['score', 'username',
         'saltiest_comment_text', 'saltiest_comment_id']
 
 users_report = pd.DataFrame(observations, columns=headers)
+#TODO: implement rank (sort by score)
 
 print(users_report) # Debug use only, delete.
 
