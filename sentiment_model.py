@@ -1,8 +1,20 @@
 import requests
-import nltk
-nltk.download('punkt')
+# import nltk
+# nltk.download('punkt')
 from textblob import TextBlob
 
+# Certificate error workaround
+# https://stackoverflow.com/questions/38916452/nltk-download-ssl-certificate-verify-failed
+'''import ssl
+
+try:
+    _create_unverified_https_context = ssl._create_unverified_context
+except AttributeError:
+    pass
+else:
+    ssl._create_default_https_context = _create_unverified_https_context
+
+nltk.download()'''
 
 def score_sentiment(text):
         '''Extract sentiment (total and average) from  multi-sentence string, sentence by sentence'''
@@ -14,9 +26,3 @@ def score_sentiment(text):
                 total_sentiment += sentence.sentiment.polarity
         avg_sentiment = total_sentiment/len(blob.sentences)
         return total_sentiment, avg_sentiment
-
-<<<<<<< HEAD
-        # my comment > your comment
-=======
-#Test commit (DeleteME)
->>>>>>> 15be4bdabfd9c0942274536d9b703e61e278ca8f

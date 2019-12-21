@@ -1,7 +1,7 @@
 import pandas as pd
 from datetime import datetime
-from .sentiment_model import score_sentiment
-from .get_user_posts import get_user_posts
+from sentiment_model import score_sentiment
+from hacker_access import get_user_posts
 
 class User():
 
@@ -19,6 +19,7 @@ class User():
         """Returns pandas dataframe {'comment_id', 'text'} with id > last_loaded_comment"""
         ids, posts = get_user_posts(username, limit=20)
         comments_df = pd.DataFrame(list(zip(ids, posts)))
+        
         # Dummy return
         # dummy_df = pd.DataFrame([[0,'dummy text', 0]], columns=self.cols)
         return comments_df
@@ -37,12 +38,13 @@ class User():
         self.mean_sentiment = self.scored_comments['sentiment'].mean()
 
     def get_saltiest_comment(self):
-        """return comment with min sentiment"""
+        """return comment with min sentiment as a dictionary"""
         # TODO: Implement, builds off get_new_comments
 
-        # Dummy return
-        dummy_comment = [0, 'dummy saltiest text', 0]
-        return dummy_comment   
+        # Dummy return values
+        id = 0
+        text = 'dummy saltiest text'
+        score = 0.0
 
-    def push_heroku():
-
+        slatiest_comment = {'id' : id, 'text' : text, 'score' : score}
+        return slatiest_comment
