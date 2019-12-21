@@ -10,7 +10,7 @@ class User():
         self.username = username
         cols = ['comment_id', 'text', 'sentiment']
         self.scored_comments = pd.DataFrame(columns=cols)
-        # update_sentiment(self.username)
+        self.get_sentiment()
         self.last_update = datetime.now()
         self.latest_comment_id = self.scored_comments.tail(1)['comment_id']
         self.mean_sentiment = 0
@@ -24,9 +24,14 @@ class User():
         # dummy_df = pd.DataFrame([[0,'dummy text', 0]], columns=self.cols)
         return comments_df
 
+    def get_sentiment(self):
+        '''Gets sentiment value from scratch'''
+        self.scored_comments = get_user_posts(self.username, limit=20)
+        self.scored_comments['sentiment'] = score_sentiment(self.scored_comments['text'])
+        self.mean_sentiment = self.scored_comments['sentiment'].mean()
 
     def update_sentiment(self):
-        # Load new comments into df
+        # Load new comments into "Scored comments" DataFrame
         new_comments_df = self.get_new_comments(self.username)
 
         # Score new comments
