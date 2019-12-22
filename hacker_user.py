@@ -8,14 +8,12 @@ class User():
 
     def __init__(self, username):
         self.username = username
+        self.mean_sentiment = 0
         cols = ['comment_id', 'text', 'sentiment']
         self.scored_comments = pd.DataFrame(columns=cols)
-        print(f'Debug: initialized {username} database') # Debug use. delete.
         self.get_sentiment()
         self.last_update = datetime.now()
         self.latest_comment_id = self.scored_comments.tail(1)['comment_id']
-        self.mean_sentiment = 0
-        print(f'Debug: initialization of {username} completed.') # Debug use. delete.
 
     def get_new_comments(self, username, last_loaded_comment=0):
         """Returns pandas dataframe {'comment_id', 'text'} with id > last_loaded_comment"""
@@ -30,8 +28,10 @@ class User():
         '''Gets sentiment value from scratch'''
         comments = get_user_posts(self.username, limit=20)
         self.scored_comments['comment_id'], self.scored_comments['text'] = comments
-        self.scored_comments['sentiment'] = score_sentiment(self.scored_comments['text'][0])
+        self.scored_comments['sentiment'] = self.scored_comments['text'].apply(lambda row: score_sentiment(row))
+        print(f"sentiments: {self.scored_comments['sentiment'].mean()}")
         self.mean_sentiment = self.scored_comments['sentiment'].mean()
+        print(self.mean_sentiment)
 
     def update_sentiment(self):
         # Load new comments into "Scored comments" DataFrame
