@@ -4,8 +4,7 @@ import pandas as pd
 from hacker_user import User
 from heroku_pass_off import push_heroku
 
-users_usernames = hacker_access.get_user_list() # [:5] if for dubug use only
-# print(users_usernames[0:10])
+users_usernames = hacker_access.get_user_list()
 observations = []
 
 for username in users_usernames[0:20]:
@@ -27,11 +26,11 @@ headers = ['score', 'username',
 
 users_report = pd.DataFrame(observations, columns=headers)
 users_report = users_report.sort_values(by=['score'])
-users_report.reindex()
+users_report = users_report.reset_index(drop=True)
 top_20_table = users_report.head(20)
 
 print(f'passing to heroku: \n{top_20_table}')
-# push_heroku(top_20_table)
+push_heroku(top_20_table)
 
 
 
