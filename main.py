@@ -14,11 +14,9 @@ for username in users_usernames[0:20]:
     user = User(username)
 
     mean_sentiment = user.mean_sentiment
-    print(f'main mean:{mean_sentiment}')
     saltiest_comment = user.get_saltiest_comment()
-    print(f'saltiest:{saltiest_comment}')
 
-    user_report = [mean_sentiment, username, saltiest_comment['text'], saltiest_comment['id']]
+    user_report = [mean_sentiment, username, saltiest_comment['text'], saltiest_comment['comment_id']]
     observations.append(user_report)
 
 headers = ['score', 'username', 

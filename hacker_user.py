@@ -20,8 +20,6 @@ class User():
         ids, posts = get_user_posts(username, limit=20)
         comments_df = pd.DataFrame(list(zip(ids, posts)))
         
-        # Dummy return
-        # dummy_df = pd.DataFrame([[0,'dummy text', 0]], columns=self.cols)
         return comments_df
 
     def get_sentiment(self):
@@ -29,9 +27,7 @@ class User():
         comments = get_user_posts(self.username, limit=20)
         self.scored_comments['comment_id'], self.scored_comments['text'] = comments
         self.scored_comments['sentiment'] = self.scored_comments['text'].apply(lambda row: score_sentiment(row))
-        print(f"sentiments: {self.scored_comments['sentiment'].mean()}")
         self.mean_sentiment = self.scored_comments['sentiment'].mean()
-        print(self.mean_sentiment)
 
     def update_sentiment(self):
         # Load new comments into "Scored comments" DataFrame
@@ -47,12 +43,6 @@ class User():
 
     def get_saltiest_comment(self):
         """return comment with min sentiment as a dictionary"""
-        # TODO: Implement, builds off get_new_comments
-
-        # Dummy return values
-        id = 0
-        text = 'dummy saltiest text'
-        score = 0.0
-
-        slatiest_comment = {'id' : id, 'text' : text, 'score' : score}
-        return slatiest_comment
+        saltiest_comment = self.scored_comments[self.scored_comments.sentiment == self.scored_comments.sentiment.min()]
+       
+        return saltiest_comment
