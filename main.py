@@ -2,30 +2,33 @@
 import hacker_access
 import pandas as pd
 from hacker_user import User
+from heroku_pass_off import push_heroku
 
 users_usernames = hacker_access.get_user_list()
-
 observations = []
 
-for username in users_usernames:
+for username in users_usernames[0:20]:
 
     print('Loading user: ', username) # Debug use only, delete.
 
     user = User(username)
-    user.update_sentiment() # Consider calling as part of __init__
 
     mean_sentiment = user.mean_sentiment
     saltiest_comment = user.get_saltiest_comment()
 
-    user_report = [mean_sentiment, username, saltiest_comment['text'], saltiest_comment['id']]
+    user_report = [mean_sentiment, username, saltiest_comment['text'], saltiest_comment['comment_id']]
     observations.append(user_report)
 
 headers = ['score', 'username', 
         'saltiest_comment_text', 'saltiest_comment_id']
 
 users_report = pd.DataFrame(observations, columns=headers)
+users_report = users_report.sort_values(by=['score'])
+users_report = users_report.reset_index(drop=True)
+top_20_table = users_report.head(20)
 
-print(users_report) # Debug use only, delete.
+print(f'passing to heroku: \n{top_20_table}')
+push_heroku(top_20_table)
 
 
 

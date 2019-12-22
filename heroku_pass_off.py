@@ -1,4 +1,4 @@
-def push_heroku(self):
+def push_heroku(df):
         # Push to backend
 
         # Needs df

@@ -20,7 +20,6 @@ def score_sentiment(text):
         '''Extract sentiment (total and average) from  multi-sentence string, sentence by sentence'''
         #Convert string into TextBlob
         blob = TextBlob(text)
-        #Print polarity of each sentence
         total_sentiment = 0
         for sentence in blob.sentences:
                 total_sentiment += sentence.sentiment.polarity
