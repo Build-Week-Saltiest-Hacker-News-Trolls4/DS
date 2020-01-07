@@ -30,6 +30,7 @@ class User():
         self.mean_sentiment = self.scored_comments['sentiment'].mean()
 
     def update_sentiment(self):
+        '''Loads only new comments. Depends on: get_new_comments() and score_comments()'''
         # Load new comments into "Scored comments" DataFrame
         new_comments_df = self.get_new_comments(self.username)
 
