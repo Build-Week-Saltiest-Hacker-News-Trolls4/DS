@@ -1,54 +1,61 @@
 import json
 import requests
 
-#TODO: max item in DB vs max item on site...how to pull the highest comment ID the database contains? Probably requries SQL query.
-def get_posts_and_users():
-  '''
-  Request latest comments, add usernames and their comments to respective lists, later to databases in separate function
-  
-  Returns: 
-    comment_ids (list<int>): Filtered comment ids as a list of integers.
-    usernames (list<str>): Comment usernames as a list of strings.
-    filtered_comments (list<str>): Filtered post ids as a list of strings.
+#TODO: max item in DB vs max item on site...
+# how to pull the highest comment ID the database contains? 
+# Probably requries SQL query.
+
+def get_new_comments():
+    """
+    Request latest comments, add usernames and their comments to respective lists, 
+    later to databases in separate function
+
+    Returns: 
+        comment_ids (list<int>): Filtered comment ids as a list of integers.
+        usernames (list<str>): Comment usernames as a list of strings.
+        filtered_comments (list<str>): Filtered post ids as a list of strings.
+
+    """
+    max_item_id = requests.get('https://hacker-news.firebaseio.com/v0/maxitem.json?print=pretty').json()
+    comment_ids = [] 
+    usernames = [] 
+    filtered_comments = []
     
-    '''
-  max_item_id = requests.get('https://hacker-news.firebaseio.com/v0/maxitem.json?print=pretty').json()
-  comment_ids = [] 
-  usernames = [] 
-  filtered_comments = []
-  #Count down from most recent comment id until range limit is reached
-  #TODO: Range value should be # of comments since DB's last recorded ID
-  for i in range(100): 
-          post = requests.get(f'https://hacker-news.firebaseio.com/v0/item/{max_item_id-i}.json').json()
-          #Get comment text and commenter
-          if (post['type'] == 'comment'):
+    # Accessing file
+    txt_file = open("latest_comment_id.txt","r")
+    # Assumes the file contains a single line
+    latest_comment_id = int(txt_file.read())
+    # Erase old value
+    txt_file.close()
+    
+    # Write new latest_comment_id value
+    txt_file = open("latest_comment_id.txt","w")
+    txt_file.write(f'{max_item_id}')
+    txt_file.close()
+
+    
+
+    # Count down from most recent comment id until range limit is reached
+
+    for item_id in range(latest_comment_id+1, max_item_id): 
+            
+            post = requests.get(f'https://hacker-news.firebaseio.com/v0/item/{item_id}.json').json()
+            
+            #Get comment text and commenter
+            if (post['type'] == 'comment'):
               comment_id = post.get('id')
               user = post.get('by')
               text = post.get('text') 
+              
               #Text==null if post was deleted
               if text:
                   filtered_comments.append(text)
-                  comment_ids.append(id)
-                #Append username if not already recorded in list
-                  if user not in usernames:
-                    usernames.append(user)
-              #PRINTS FOR DEBUGGING 
-              print(comment_id)
-              print(user)
-              print(text)
-  
-  return comment_ids, usernames, filtered_comments
-                  # filtered_post_ids.append(post_id)
-          # elif (post['type'] == 'story'):
-          #     text = post.get('title')
-
-          #     if text:
-          #         filtered_posts.append(text)
-          #         filtered_post_ids.append(post_id)
-
-          # # Checks whether the specified limit has been reached
-          # if len(filtered_posts) == limit:
-          #     break
+                  comment_ids.append(item_id)
+                  usernames.append(user)
+            print(user, item_id, text)        
+ 
+    # TODO return zip into df
+    return comment_ids, usernames, filtered_comments
 
 def get_user_posts(username, filter_posts="comment", limit=100):
     """ 
