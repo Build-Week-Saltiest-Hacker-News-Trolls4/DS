@@ -45,23 +45,8 @@ Returns:
                 #Append username if not already recorded in list
                   if user not in usernames:
                     usernames.append(user)
-              #PRINTS FOR DEBUGGING 
-              print(comment_id)
-              print(user)
-              print(text)
   
   return comment_ids, usernames, filtered_comments
-                  # filtered_post_ids.append(post_id)
-          # elif (post['type'] == 'story'):
-          #     text = post.get('title')
-
-          #     if text:
-          #         filtered_posts.append(text)
-          #         filtered_post_ids.append(post_id)
-
-          # # Checks whether the specified limit has been reached
-          # if len(filtered_posts) == limit:
-          #     break
 
 def get_user_posts(username, filter_posts="comment", limit=100):
     """ 
