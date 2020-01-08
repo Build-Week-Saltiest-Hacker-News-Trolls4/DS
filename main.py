@@ -19,7 +19,10 @@ for username in df_by_comments.sort_values(by='sentiment', ascending=False)['use
     mean_sentiment = user.mean_sentiment
     saltiest_comment = user.get_saltiest_comment()
 
-    user_report = [mean_sentiment, username, saltiest_comment['text'], saltiest_comment['comment_id']]
+    saltiest_comment_text = saltiest_comment['text'].to_string(index=False)
+    saltiest_comment_id = saltiest_comment['comment_id'].to_string(index=False)
+
+    user_report = [mean_sentiment, username, saltiest_comment_text, saltiest_comment_id]
     observations.append(user_report)
 
 headers = ['score', 'username', 
