@@ -17,10 +17,11 @@ def get_new_comments():
 
     """
     # Reading from file
-    f = open("last_comment_id.txt","r")
+    f = open("latest_comment_id.txt","r")
     if f.mode == 'r':
         # Assumes the file contains a single line
         latest_comment_id = int(f.read())
+    print("Latest loaded:", latest_comment_id)
 
     max_item_id = requests.get('https://hacker-news.firebaseio.com/v0/maxitem.json?print=pretty').json()
     comment_ids = [] 
