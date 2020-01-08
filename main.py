@@ -3,7 +3,10 @@ import hacker_access
 import pandas as pd
 from hacker_user import User
 from heroku_pass_off import push_heroku
+<<<<<<< HEAD
+=======
 
+>>>>>>> a40eed52f4dc420807ec850b1a418cd801080dfa
 df_by_comments = hacker_access.get_posts_and_users()
 # df_by_users = hacker_access.update(df_by_comments)
 observations = []
