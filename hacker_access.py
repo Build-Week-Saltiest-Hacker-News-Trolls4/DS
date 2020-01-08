@@ -12,16 +12,23 @@ def get_posts_and_users():
     filtered_comments (list<str>): Filtered post ids as a list of strings.
     
     '''
-  max_item_id = requests.get('https://hacker-news.firebaseio.com/v0/maxitem.json?print=pretty').json()
-  comment_ids = [] 
-  usernames = [] 
-  filtered_comments = []
-  #Count down from most recent comment id until range limit is reached
-  #TODO: Range value should be # of comments since DB's last recorded ID
-  for i in range(100): 
-          post = requests.get(f'https://hacker-news.firebaseio.com/v0/item/{max_item_id-i}.json').json()
-          #Get comment text and commenter
-          if (post['type'] == 'comment'):
+    # Reading from file
+    f = open("last_comment_id.txt","r")
+    if f.mode == 'r':
+        # Assumes the file contains a single line
+        latest_comment_id = int(f.read())
+
+    max_item_id = requests.get('https://hacker-news.firebaseio.com/v0/maxitem.json?print=pretty').json()
+    comment_ids = [] 
+    usernames = [] 
+    filtered_comments = []
+
+    # Count down from most recent comment id until range limit is reached
+
+    for i in range(max_item_id - latest_comment_id): 
+            post = requests.get(f'https://hacker-news.firebaseio.com/v0/item/{max_item_id-i}.json').json()
+            #Get comment text and commenter
+            if (post['type'] == 'comment'):
               comment_id = post.get('id')
               user = post.get('by')
               text = post.get('text') 
