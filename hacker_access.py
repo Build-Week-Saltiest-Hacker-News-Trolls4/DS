@@ -1,17 +1,21 @@
 import json
 import requests
 
-#TODO: max item in DB vs max item on site...how to pull the highest comment ID the database contains? Probably requries SQL query.
+#TODO: max item in DB vs max item on site...
+# how to pull the highest comment ID the database contains? 
+# Probably requries SQL query.
+
 def get_new_comments():
-  '''
-  Request latest comments, add usernames and their comments to respective lists, later to databases in separate function
-  
-  Returns: 
+'''
+Request latest comments, add usernames and their comments to respective lists, 
+later to databases in separate function
+
+Returns: 
     comment_ids (list<int>): Filtered comment ids as a list of integers.
     usernames (list<str>): Comment usernames as a list of strings.
     filtered_comments (list<str>): Filtered post ids as a list of strings.
-    
-    '''
+
+'''
     # Reading from file
     f = open("last_comment_id.txt","r")
     if f.mode == 'r':
@@ -25,8 +29,10 @@ def get_new_comments():
 
     # Count down from most recent comment id until range limit is reached
 
-    for i in range(max_item_id - latest_comment_id): 
-            post = requests.get(f'https://hacker-news.firebaseio.com/v0/item/{max_item_id-i}.json').json()
+    for item_id in range(latest_comment_id, max_item_id): 
+            
+            post = requests.get(f'https://hacker-news.firebaseio.com/v0/item/{item_id}.json').json()
+            
             #Get comment text and commenter
             if (post['type'] == 'comment'):
               comment_id = post.get('id')
