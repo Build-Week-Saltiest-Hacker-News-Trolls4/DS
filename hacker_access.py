@@ -30,7 +30,7 @@ def get_new_comments():
 
     # Count down from most recent comment id until range limit is reached
 
-    for item_id in range(latest_comment_id, max_item_id): 
+    for item_id in range(latest_comment_id+1, max_item_id): 
             
             post = requests.get(f'https://hacker-news.firebaseio.com/v0/item/{item_id}.json').json()
             
