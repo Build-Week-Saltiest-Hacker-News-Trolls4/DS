@@ -1,9 +1,11 @@
 import json
 import requests
 
+from sentiment_model import score_sentiment
+
 import pandas as pd
 #TODO: max item in DB vs max item on site...how to pull the highest comment ID the database contains? Probably requries SQL query.
-def get_posts_and_users(last_item_id):
+def get_posts_and_users(last_item_id=21987597):
   '''
   Request latest comments, add usernames and their comments to respective lists, later to databases in separate function
   
@@ -19,7 +21,7 @@ def get_posts_and_users(last_item_id):
   filtered_comments = []
   #Count down from most recent comment id until range limit is reached
   #TODO: Range value should be # of comments since DB's last recorded ID
-  for i in range(max_item_id - last_item_id): 
+  for i in range(int(max_item_id) - last_item_id): 
           post = requests.get(f'https://hacker-news.firebaseio.com/v0/item/{max_item_id-i}.json').json()
           #Get comment text and commenter
           if (post['type'] == 'comment'):
@@ -38,6 +40,7 @@ def get_posts_and_users(last_item_id):
               print(user)
               print(text)
   df = pd.DataFrame(list(zip(comment_ids, usernames, filtered_comments)), columns = ['comment_id', 'username', 'comment'])
+  df['sentiment'] = [score_sentiment(comment) for comment in df['comment']]
   return df
                   # filtered_post_ids.append(post_id)
           # elif (post['type'] == 'story'):
