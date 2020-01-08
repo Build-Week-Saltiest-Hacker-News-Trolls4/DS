@@ -42,10 +42,10 @@ Returns:
               if text:
                   filtered_comments.append(text)
                   comment_ids.append(id)
-                #Append username if not already recorded in list
-                  if user not in usernames:
-                    usernames.append(user)
-  
+                  usernames.append(user)
+                    
+ 
+  # TODO return zip into df
   return comment_ids, usernames, filtered_comments
 
 def get_user_posts(username, filter_posts="comment", limit=100):
