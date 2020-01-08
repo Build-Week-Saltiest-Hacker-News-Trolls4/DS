@@ -2,7 +2,7 @@ import json
 import requests
 
 #TODO: max item in DB vs max item on site...how to pull the highest comment ID the database contains? Probably requries SQL query.
-def get_posts_and_users():
+def get_new_comments():
   '''
   Request latest comments, add usernames and their comments to respective lists, later to databases in separate function
   
