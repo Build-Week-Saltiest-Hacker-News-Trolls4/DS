@@ -38,12 +38,13 @@ Returns:
               comment_id = post.get('id')
               user = post.get('by')
               text = post.get('text') 
+              
               #Text==null if post was deleted
               if text:
                   filtered_comments.append(text)
-                  comment_ids.append(id)
+                  comment_ids.append(item_id)
                   usernames.append(user)
-                    
+            print(user, item_id, text)        
  
   # TODO return zip into df
   return comment_ids, usernames, filtered_comments
