@@ -4,10 +4,6 @@ import pandas as pd
 from hacker_user import User
 from heroku_pass_off import push_heroku
 
-# Debug Start: Delete this
-hacker_access.get_new_comments()
-# Debug End: Delete this
-
 users_usernames = hacker_access.get_user_list()
 observations = []
 

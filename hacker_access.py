@@ -16,17 +16,24 @@ def get_new_comments():
         filtered_comments (list<str>): Filtered post ids as a list of strings.
 
     """
-    # Reading from file
-    f = open("latest_comment_id.txt","r")
-    if f.mode == 'r':
-        # Assumes the file contains a single line
-        latest_comment_id = int(f.read())
-    print("Latest loaded:", latest_comment_id)
-
     max_item_id = requests.get('https://hacker-news.firebaseio.com/v0/maxitem.json?print=pretty').json()
     comment_ids = [] 
     usernames = [] 
     filtered_comments = []
+    
+    # Accessing file
+    txt_file = open("latest_comment_id.txt","r")
+    # Assumes the file contains a single line
+    latest_comment_id = int(txt_file.read())
+    # Erase old value
+    txt_file.close()
+    
+    # Write new latest_comment_id value
+    txt_file = open("latest_comment_id.txt","w")
+    txt_file.write(f'{max_item_id}')
+    txt_file.close()
+
+    
 
     # Count down from most recent comment id until range limit is reached
 
