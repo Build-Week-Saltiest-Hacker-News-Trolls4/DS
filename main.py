@@ -4,13 +4,14 @@ import pandas as pd
 from hacker_user import User
 from heroku_pass_off import push_heroku
 
-df_by_comments = hacker_access.get_posts_and_users()
+users_usernames = hacker_access.get_user_list()
+# df_by_comments = hacker_access.get_posts_and_users()
 # df_by_users = hacker_access.update(df_by_comments)
 observations = []
 
 # df.sort_values('comment_id')
 
-for username in df_by_comments.sort_values(by='sentiment', ascending=False)['username']:
+for username in users_usernames[0:20]:
 
     print('Loading user: ', username) # Debug use only, delete.
 
