@@ -6,16 +6,16 @@ import requests
 # Probably requries SQL query.
 
 def get_new_comments():
-'''
-Request latest comments, add usernames and their comments to respective lists, 
-later to databases in separate function
+    """
+    Request latest comments, add usernames and their comments to respective lists, 
+    later to databases in separate function
 
-Returns: 
-    comment_ids (list<int>): Filtered comment ids as a list of integers.
-    usernames (list<str>): Comment usernames as a list of strings.
-    filtered_comments (list<str>): Filtered post ids as a list of strings.
+    Returns: 
+        comment_ids (list<int>): Filtered comment ids as a list of integers.
+        usernames (list<str>): Comment usernames as a list of strings.
+        filtered_comments (list<str>): Filtered post ids as a list of strings.
 
-'''
+    """
     # Reading from file
     f = open("last_comment_id.txt","r")
     if f.mode == 'r':
@@ -46,8 +46,8 @@ Returns:
                   usernames.append(user)
             print(user, item_id, text)        
  
-  # TODO return zip into df
-  return comment_ids, usernames, filtered_comments
+    # TODO return zip into df
+    return comment_ids, usernames, filtered_comments
 
 def get_user_posts(username, filter_posts="comment", limit=100):
     """ 
