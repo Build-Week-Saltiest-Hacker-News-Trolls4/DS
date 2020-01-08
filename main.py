@@ -5,6 +5,7 @@ from hacker_user import User
 from heroku_pass_off import push_heroku
 
 users_usernames = hacker_access.get_user_list()
+
 # df_by_comments = hacker_access.get_posts_and_users()
 # df_by_users = hacker_access.update(df_by_comments)
 observations = []
