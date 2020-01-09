@@ -37,6 +37,3 @@ top_20_table = users_report.head(20)
 
 print(f'passing to heroku: \n{top_20_table}')
 push_heroku(top_20_table)
-
-
-
