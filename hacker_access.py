@@ -1,9 +1,16 @@
+import html
 import json
+import re
 import requests
 
+import pandas as pd
 #TODO: max item in DB vs max item on site...
 # how to pull the highest comment ID the database contains? 
 # Probably requries SQL query.
+def remove_html_tags(text):
+    '''Removes HTML tags from a string using regular rexpression, returns a string'''
+   clean = re.compile('<.*?>')
+   return re.sub(clean, '', text)
 
 def get_new_comments():
     """
@@ -55,7 +62,12 @@ def get_new_comments():
             print(user, item_id, text)        
  
     # TODO return zip into df
-    return comment_ids, usernames, filtered_comments
+    df = pd.DataFrame(list(zip(comment_ids, usernames, filtered_comments)), columns=['comment_ID', 'username', 'comment'])
+    df['comment']=df['comment'].apply(str)
+    df['comment'] = df['comment'].apply(lambda x: html.unescape(x))
+    df['comment'] = df['comment'].apply(lambda x: remove_html_tags(x))
+    
+    return df
 
 def get_user_posts(username, filter_posts="comment", limit=100):
     """ 
