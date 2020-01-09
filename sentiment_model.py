@@ -1,5 +1,7 @@
 import requests
-# import nltk
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
 # nltk.download('punkt')
 from textblob import TextBlob
 
@@ -16,9 +18,13 @@ else:
 
 nltk.download()'''
 
-def score_sentiment(text):
+def score_sentiment(tweet):
         '''Extract sentiment (total and average) from  multi-sentence string, sentence by sentence'''
+        words = word_tokenize(tweet)
+        stop_words = set(stopwords.words('english'))
+        filtered_sentence = [w for w in words if w not in stop_words]
         #Convert string into TextBlob
+        text = ''.join(filtered_sentence)
         blob = TextBlob(text)
         total_sentiment = 0
         for sentence in blob.sentences:
