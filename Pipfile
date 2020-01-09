@@ -8,6 +8,10 @@ pylint = "*"
 
 [packages]
 apscheduler = "*"
+pandas = "*"
+requests = "*"
+nltk = "*"
+textblob = "*"
 
 [requires]
 python_version = "3.7"
