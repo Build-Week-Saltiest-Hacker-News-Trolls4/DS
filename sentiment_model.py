@@ -1,7 +1,12 @@
+# from decouple import config
+import json
 import requests
+
 import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
+import pandas as pd
+from sklearn.preprocessing import QuantileTransformer
 # nltk.download('punkt')
 from textblob import TextBlob
 
@@ -25,11 +30,22 @@ def score_sentiment(tweet):
         filtered_sentence = [w for w in words if w not in stop_words]
         #Convert string into TextBlob
         text = ''.join(filtered_sentence)
-        blob = TextBlob(text)
-        total_sentiment = 0
-        for sentence in blob.sentences:
-                total_sentiment += sentence.sentiment.polarity
-        avg_sentiment = total_sentiment/len(blob.sentences)
+        # blob = TextBlob(text)
+        # total_sentiment = 0
+        api_key = "AIzaSyAnwbBNaqHVuM82djR3-nybIezDsBu-X8Q"
+        url = ('https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze' +    
+            '?key=' + api_key)
+        data_dict = {
+            'comment': {'text': text},
+            'languages': ['en'],
+            'requestedAttributes': {'TOXICITY': {}}
+        }
+        response = requests.post(url=url, data=json.dumps(data_dict)) 
+        response_dict = json.loads(response.content) 
+        avg_sentiment = response_dict["attributeScores"]["TOXICITY"]["summaryScore"]["value"]
+        # for sentence in blob.sentences:
+        #         total_sentiment += sentence.sentiment.polarity
+        # avg_sentiment = total_sentiment/len(blob.sentences)
         return avg_sentiment
         # ,total_sentiment
 
