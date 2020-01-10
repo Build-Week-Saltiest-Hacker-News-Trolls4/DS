@@ -61,13 +61,15 @@ def get_new_comments():
                   filtered_comments.append(text)
                   comment_ids.append(item_id)
                   usernames.append(user)
-            print(user, item_id, text)        
+            # print(user, item_id, text)        
  
     df = pd.DataFrame(list(zip(comment_ids, usernames, filtered_comments)), columns=['comment_ID', 'username', 'comment'])
     df['comment']=df['comment'].apply(str)
-    df['comment'] = df['comment'].apply(lambda x: html.unescape(x))
     df['comment'] = df['comment'].apply(lambda x: remove_html_tags(x))
+    df['comment'] = df['comment'].apply(lambda x: html.unescape(x))
     df['sentiment'] = df['comment'].apply(lambda x: score_sentiment(x))
+    for i in range(len(df['comment'])):
+        print(df['comment'][i])
     return df
 
 def update_user_scores(new_comments):
@@ -75,8 +77,8 @@ def update_user_scores(new_comments):
     with sqlite3.connect('test.db') as conn:
         cursor = conn.cursor()
         cursor.execute('''
-        CREATE TABLE [IF NOT EXISTS] user_scores(
-        id INTEGER PRIMARY KEY
+        CREATE TABLE IF NOT EXISTS user_scores (
+        id INTEGER PRIMARY KEY,
         user TEXT NOT NULL,
         avg_score REAL NOT NULL,
         num_comments INTEGER NOT NULL,
@@ -110,8 +112,8 @@ def update_user_scores(new_comments):
             this_user_stats = cursor.fetchall()
             
             # Update avg_score
-            avg_score = this_user_stats[col('avg_score')]
-            num_comments = this_user_stats[col('num_comments')]
+            avg_score = this_user_stats[col['avg_score']]
+            num_comments = this_user_stats[col['num_comments']]
             this_comment_sentiment = comment['sentiment']
 
             new_avg_score = (avg_score * num_comments + this_comment_sentiment) / (num_comments + 1)
@@ -127,7 +129,7 @@ def update_user_scores(new_comments):
                             ''')
 
             # Update saltiest_comment and saltiest_comment_id if needed
-            if this_comment_sentiment < this_user_stats[col('saltiest_comment_sentiment')]:
+            if this_comment_sentiment < this_user_stats[col['saltiest_comment_sentiment']]:
                 cursor.execute(f'''
                             UPDATE user_scores
                             SET saltiest_comment = {comment['comment']},
