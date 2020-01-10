@@ -5,6 +5,7 @@ import requests
 import pandas as pd
 import sqlite3
 
+from sentiment_model import *
 #TODO: max item in DB vs max item on site...
 # how to pull the highest comment ID the database contains? 
 # Probably requries SQL query.
@@ -66,10 +67,26 @@ def get_new_comments():
     df['comment']=df['comment'].apply(str)
     df['comment'] = df['comment'].apply(lambda x: html.unescape(x))
     df['comment'] = df['comment'].apply(lambda x: remove_html_tags(x))
-    
+    df['sentiment'] = df['comment'].apply(lambda x: score_sentiment(x))
     return df
 
 def update_user_scores(new_comments):
+    #Check to see if sqlite3 db exists, if not create it
+    with sqlite3.connect('test.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+        CREATE TABLE [IF NOT EXISTS] user_scores(
+        id INTEGER PRIMARY KEY
+        user TEXT NOT NULL,
+        avg_score REAL NOT NULL,
+        num_comments INTEGER NOT NULL,
+        saltiest_comment TEXT NOT NULL,
+        saltiest_comment_sentiment REAL NOT NULL,
+        saltiest_comment_id INTEGER NOT NULL)
+        ''')
+    #Split new_comments into existing_users (already in db) and new_users (not in db yet)
+
+    #For existing users recalculate avg_score, num_comments, saltiest_comment, saltiest_comment_id
     # Check to see if sqlite3 db exists so, connect, if not create it
     
     # For existing_users recalculate avg_score, num_comments, saltiest_comment, saltiest_comment_sentiment, saltiest_comment_id
@@ -132,9 +149,15 @@ def update_user_scores(new_comments):
             
     # Stretch
     # For new_users get_last_30_comments and include in calculations
-
-    # return df sorted by normalized saltiness
-
+    conn = sqlite3.connect('test.db')
+    query = pd.read_sql_query('SELECT * FROM user_scores', conn)
+    df = pd.DataFrame(query, columns=['id', 'user', 'avg_score', 'num_comments',
+                                      'saltiest_comment', 'saltiest_comment_sentiment',
+                                      'saltiest comment_id'])
+    df = df.set_index('id')
+    df['avg_score'] = scale_sentiments(df['avg_score'])
+    return df.sort_by('avg_score', ascending=False)
+    # return df sorted by saltiness
  
 
 

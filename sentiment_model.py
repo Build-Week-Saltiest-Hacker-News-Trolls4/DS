@@ -32,3 +32,14 @@ def score_sentiment(tweet):
         avg_sentiment = total_sentiment/len(blob.sentences)
         return avg_sentiment
         # ,total_sentiment
+
+def scale_sentiments(sentiments):
+    '''
+    Use QuantileTransformer to convert sentiment score to value between 0 and 100
+    input: initial Sentiment Score pandas Series
+    returns: scaled Sentiment Score pandas Series
+    '''
+    scaler = QuantileTransformer()
+    scaler.fit_transform(sentiments)
+    sentiments = [score*100 for score in sentiments]
+    return pd.Series(sentiments)
