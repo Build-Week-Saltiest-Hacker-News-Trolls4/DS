@@ -87,7 +87,66 @@ def update_user_scores(new_comments):
     #Split new_comments into existing_users (already in db) and new_users (not in db yet)
 
     #For existing users recalculate avg_score, num_comments, saltiest_comment, saltiest_comment_id
+    # Check to see if sqlite3 db exists so, connect, if not create it
     
+    # For existing_users recalculate avg_score, num_comments, saltiest_comment, saltiest_comment_sentiment, saltiest_comment_id
+    # For new users, append (for now, there is a stretch annotated below)
+
+    col = {'user':1, 'avg_score':2, 'num_comments':3, 'saltiest_comment':4, 'saltiest_comment_id':5}
+    
+    for comment in new_comments:
+        
+        this_user = comment['username']
+        
+        cursor.execute(f'''
+                        SELECT avg_score, num_comments, saltiest_comment, saltiest_comment_sentiment, saltiest_comment_id
+                        FROM user_scores
+                        WHERE user={this_user}
+                        ''')
+        
+       
+        # Case: Existing user
+        if cursor.rowcount() > 0:
+            this_user_stats = cursor.fetchall()
+            
+            # Update avg_score
+            avg_score = this_user_stats[col('avg_score')]
+            num_comments = this_user_stats[col('num_comments')]
+            this_comment_sentiment = comment['sentiment']
+
+            new_avg_score = (avg_score * num_comments + this_comment_sentiment) / (num_comments + 1)
+
+            # Update num_comments
+            new_num_comments = num_comments + 1
+
+            cursor.execute(f'''
+                            UPDATE user_scores
+                            SET avg_score = {new_avg_score},
+                                num_comments = {new_num_comments}
+                            WHERE user = {this_user}
+                            ''')
+
+            # Update saltiest_comment and saltiest_comment_id if needed
+            if this_comment_sentiment < this_user_stats[col('saltiest_comment_sentiment')]:
+                cursor.execute(f'''
+                            UPDATE user_scores
+                            SET saltiest_comment = {comment['comment']},
+                                saltiest_comment_sentiment = {comment['sentiment']},
+                                saltiest_comment_id = {comment['comment_ID']}
+                            WHERE user = {this_user}
+                            ''')
+
+        # Case: New user
+        else:
+            # append user to db
+            cursor.execute(f'''
+                            INSERT INTO user_scores (user, avg_score, num_comments, 
+                                                    saltiest_comment, saltiest_comment_sentiment, saltiest_comment_id)
+                            VALUES({this_user}, {comment['sentiment']}, 1, 
+                                    {comment['comment']}, {comment['sentiment']}, 
+                                    {comment['comment_ID']})
+                            ''')
+            
     # Stretch
     # For new_users get_last_30_comments and include in calculations
     conn = sqlite3.connect('test.db')
