@@ -161,7 +161,7 @@ def update_user_scores(new_comments):
                                       'saltiest_comment', 'saltiest_comment_sentiment',
                                       'saltiest comment_id'])
     df = df.set_index('id')
-    df['avg_score'] = scale_sentiments(df['avg_score'])
+    # df['avg_score'] = scale_sentiments(df['avg_score'])
     return df.sort_by('avg_score', ascending=False)
     # return df sorted by saltiness
  
