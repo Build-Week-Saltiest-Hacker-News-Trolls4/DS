@@ -128,7 +128,7 @@ def update_user_scores(new_comments):
                             UPDATE user_scores
                             SET avg_score = {new_avg_score},
                                 num_comments = {new_num_comments}
-                            WHERE user = {this_user}
+                            WHERE user = "{this_user}"
                             ''')
 
             # Update saltiest_comment and saltiest_comment_id if needed
@@ -138,7 +138,7 @@ def update_user_scores(new_comments):
                             SET saltiest_comment = {new_comments['comment'][ind]},
                                 saltiest_comment_sentiment = {new_comments['sentiment'][ind]},
                                 saltiest_comment_id = {new_comments['comment_ID'][ind]}
-                            WHERE user = {this_user}
+                            WHERE user = "{this_user}""
                             ''')
 
         # Case: New user
@@ -148,14 +148,14 @@ def update_user_scores(new_comments):
             cursor.execute(f'''
                             INSERT INTO user_scores (user, avg_score, num_comments, 
                                                     saltiest_comment, saltiest_comment_sentiment, saltiest_comment_id)
-                            VALUES({this_user}, {new_comments['sentiment'][ind]}, 1, 
-                                    {new_comments['comment'][ind]}, {new_comments['sentiment'][ind]}, 
-                                    {new_comments['comment_ID']})
+                            VALUES("{this_user}", {new_comments['sentiment'][ind]}, 1, 
+                                    "{new_comments['comment'][ind]}", {new_comments['sentiment'][ind]}, 
+                                    {new_comments['comment_ID'][ind]})
                             ''')
             
     # Stretch
     # For new_users get_last_30_comments and include in calculations
-    conn = sqlite3.connect('test.db')
+    # conn = sqlite3.connect('user.db')
     query = pd.read_sql_query('SELECT * FROM user_scores', conn)
     df = pd.DataFrame(query, columns=['id', 'user', 'avg_score', 'num_comments',
                                       'saltiest_comment', 'saltiest_comment_sentiment',
