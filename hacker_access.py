@@ -77,7 +77,7 @@ def update_user_scores(new_comments):
     #Check to see if sqlite3 db exists, if not create it
     print(f"db: update_user_scores ->\n {new_comments}")
 
-    with sqlite3.connect('test.db') as conn:
+    with sqlite3.connect('users.db') as conn:
         cursor = conn.cursor()
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS user_scores (
@@ -85,7 +85,7 @@ def update_user_scores(new_comments):
         user TEXT NOT NULL,
         avg_score REAL NOT NULL,
         num_comments INTEGER NOT NULL,
-        saltiest_comment TEXT NOT NULL,
+        saltiest_comment BLOB NOT NULL,
         saltiest_comment_sentiment REAL NOT NULL,
         saltiest_comment_id INTEGER NOT NULL)
         ''')
@@ -144,6 +144,7 @@ def update_user_scores(new_comments):
         # Case: New user
         else:
             # append user to db
+            print(f"About to try appending:\n {this_user, new_comments['sentiment'][ind], 1, new_comments['comment'][ind], new_comments['sentiment'][ind], new_comments['comment_ID'][ind]}")
             cursor.execute(f'''
                             INSERT INTO user_scores (user, avg_score, num_comments, 
                                                     saltiest_comment, saltiest_comment_sentiment, saltiest_comment_id)
