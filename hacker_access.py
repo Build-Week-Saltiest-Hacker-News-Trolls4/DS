@@ -155,14 +155,15 @@ def update_user_scores(new_comments):
         conn.commit()    
     # Stretch
     # For new_users get_last_30_comments and include in calculations
-    # conn = sqlite3.connect('user.db')
-    query = pd.read_sql_query('SELECT * FROM user_scores', conn)
-    df = pd.DataFrame(query, columns=['id', 'user', 'avg_score', 'num_comments',
-                                      'saltiest_comment', 'saltiest_comment_sentiment',
-                                      'saltiest comment_id'])
+    df = pd.read_sql_query('SELECT * FROM user_scores', conn)
+    # df = pd.DataFrame(query, columns=['id', 'user', 'avg_score', 'num_comments',
+    #                                  'saltiest_comment', 'saltiest_comment_sentiment',
+    #                                  'saltiest comment_id'])
     df = df.set_index('id')
     # df['avg_score'] = scale_sentiments(df['avg_score'])
-    return df.sort_values(by='avg_score', ascending=False, inplace=True)
+    print("------\n", df)
+    print("type: ", type(df))
+    return df.sort_values(by='avg_score', ascending=False)
     # return df sorted by saltiness
  
 

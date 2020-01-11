@@ -30,10 +30,10 @@ df_by_users = hacker_access.update_user_scores(df_by_comments)
 
 headers = ['score', 'username', 
         'saltiest_comment_text', 'saltiest_comment_id']
-
+print(df_by_users)
 users_report = df_by_users.rename(columns={"avg_score": "score", "user": "username",
                                   "saltiest_comment": "saltiest_comment_text"})
-users_report.drop(['num_comments', 'saltiest_comment_sentiment'], in_place=True)
+users_report.drop(['num_comments', 'saltiest_comment_sentiment'], inplace=True)
 users_report = users_report.sort_values(by=['score'])
 users_report = users_report.reset_index(drop=True)
 top_20_table = users_report.head(20)
