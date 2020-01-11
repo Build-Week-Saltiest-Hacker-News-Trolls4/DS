@@ -5,8 +5,9 @@ from hacker_user import User
 from heroku_pass_off import push_heroku
 
 # users_usernames = hacker_access.get_user_list()
-
+print("db: 1")
 df_by_comments = hacker_access.get_new_comments()
+print(f"db: 2 \n {df_by_comments}")
 df_by_users = hacker_access.update_user_scores(df_by_comments)
 # observations = []
 

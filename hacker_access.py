@@ -29,25 +29,26 @@ def get_new_comments():
     comment_ids = [] 
     usernames = [] 
     filtered_comments = []
-    
+    print("db: a")
     # Accessing file
     txt_file = open("latest_comment_id.txt","r")
     # Assumes the file contains a single line
     latest_comment_id = int(txt_file.read())
     # Erase old value
     txt_file.close()
-    
+    print("db: b")
     # Write new latest_comment_id value
     txt_file = open("latest_comment_id.txt","w")
     txt_file.write(f'{max_item_id}')
     txt_file.close()
+    print("db: c")
 
     
 
     # Count down from most recent comment id until range limit is reached
 
     for item_id in range(latest_comment_id+1, max_item_id): 
-            
+            print(f"db: d- {item_id}")
             post = requests.get(f'https://hacker-news.firebaseio.com/v0/item/{item_id}.json').json()
             
             #Get comment text and commenter
@@ -74,6 +75,8 @@ def get_new_comments():
 
 def update_user_scores(new_comments):
     #Check to see if sqlite3 db exists, if not create it
+    print(f"db: update_user_scores ->\n {new_comments}")
+
     with sqlite3.connect('test.db') as conn:
         cursor = conn.cursor()
         cursor.execute('''
@@ -96,25 +99,25 @@ def update_user_scores(new_comments):
 
     col = {'user':1, 'avg_score':2, 'num_comments':3, 'saltiest_comment':4, 'saltiest_comment_id':5}
     
-    for comment in new_comments:
-        
-        this_user = comment['username']
+    for ind in new_comments.index:
+        print(f"db: update_user_scores -> {new_comments['username'][ind]}")
+        this_user = new_comments['username'][ind]
         
         cursor.execute(f'''
                         SELECT avg_score, num_comments, saltiest_comment, saltiest_comment_sentiment, saltiest_comment_id
                         FROM user_scores
-                        WHERE user={this_user}
+                        WHERE user = "{this_user}" 
                         ''')
         
        
         # Case: Existing user
-        if cursor.rowcount() > 0:
+        if cursor.rowcount > 0:
             this_user_stats = cursor.fetchall()
             
             # Update avg_score
             avg_score = this_user_stats[col['avg_score']]
             num_comments = this_user_stats[col['num_comments']]
-            this_comment_sentiment = comment['sentiment']
+            this_comment_sentiment = new_comments['sentiment'][ind]
 
             new_avg_score = (avg_score * num_comments + this_comment_sentiment) / (num_comments + 1)
 
@@ -132,9 +135,9 @@ def update_user_scores(new_comments):
             if this_comment_sentiment < this_user_stats[col['saltiest_comment_sentiment']]:
                 cursor.execute(f'''
                             UPDATE user_scores
-                            SET saltiest_comment = {comment['comment']},
-                                saltiest_comment_sentiment = {comment['sentiment']},
-                                saltiest_comment_id = {comment['comment_ID']}
+                            SET saltiest_comment = {new_comments['comment'][ind]},
+                                saltiest_comment_sentiment = {new_comments['sentiment'][ind]},
+                                saltiest_comment_id = {new_comments['comment_ID'][ind]}
                             WHERE user = {this_user}
                             ''')
 
@@ -144,9 +147,9 @@ def update_user_scores(new_comments):
             cursor.execute(f'''
                             INSERT INTO user_scores (user, avg_score, num_comments, 
                                                     saltiest_comment, saltiest_comment_sentiment, saltiest_comment_id)
-                            VALUES({this_user}, {comment['sentiment']}, 1, 
-                                    {comment['comment']}, {comment['sentiment']}, 
-                                    {comment['comment_ID']})
+                            VALUES({this_user}, {new_comments['sentiment'][ind]}, 1, 
+                                    {new_comments['comment'][ind]}, {new_comments['sentiment'][ind]}, 
+                                    {new_comments['comment_ID']})
                             ''')
             
     # Stretch
