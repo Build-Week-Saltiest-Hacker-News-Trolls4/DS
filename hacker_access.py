@@ -149,10 +149,10 @@ def update_user_scores(new_comments):
                             INSERT INTO user_scores (user, avg_score, num_comments, 
                                                     saltiest_comment, saltiest_comment_sentiment, saltiest_comment_id)
                             VALUES("{this_user}", {new_comments['sentiment'][ind]}, 1, 
-                                    "{new_comments['comment'][ind]}", {new_comments['sentiment'][ind]}, 
+                                    "{new_comments['comment'][ind].replace('"',"'")}", {new_comments['sentiment'][ind]}, 
                                     {new_comments['comment_ID'][ind]})
                             ''')
-            
+        conn.commit()    
     # Stretch
     # For new_users get_last_30_comments and include in calculations
     # conn = sqlite3.connect('user.db')
