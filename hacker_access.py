@@ -135,7 +135,7 @@ def update_user_scores(new_comments):
             if this_comment_sentiment < this_user_stats[col['saltiest_comment_sentiment']]:
                 cursor.execute(f'''
                             UPDATE user_scores
-                            SET saltiest_comment = {new_comments['comment'][ind]},
+                            SET saltiest_comment = {new_comments['comment'][ind].replace('"',"'")},
                                 saltiest_comment_sentiment = {new_comments['sentiment'][ind]},
                                 saltiest_comment_id = {new_comments['comment_ID'][ind]}
                             WHERE user = "{this_user}""
