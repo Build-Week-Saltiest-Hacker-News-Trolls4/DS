@@ -34,8 +34,8 @@ print(df_by_users)
 users_report = df_by_users.rename(columns={"avg_score": "score", "user": "username",
                                   "saltiest_comment": "saltiest_comment_text"})
 print(users_report)
-users_report.drop(['num_comments', 'saltiest_comment_sentiment'], axis='columns' inplace=True)
-users_report = users_report.sort_values(by=['score'])
+users_report.drop(['num_comments', 'saltiest_comment_sentiment'], axis='columns', inplace=True)
+users_report = users_report.sort_values(by=['score'], ascending=False)
 users_report = users_report.reset_index(drop=True)
 top_20_table = users_report.head(20)
 
