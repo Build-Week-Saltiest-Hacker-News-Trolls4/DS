@@ -51,18 +51,17 @@ def get_new_comments():
             print(f"db: d- {item_id}")
             post = requests.get(f'https://hacker-news.firebaseio.com/v0/item/{item_id}.json').json()
             
-            #Get comment text and commenter
+            # Get comment text and commenter
             if (post['type'] == 'comment'):
               comment_id = post.get('id')
               user = post.get('by')
               text = post.get('text') 
               
-              #Text==null if post was deleted
+              # Text==null if post was deleted
               if text:
                   filtered_comments.append(text)
                   comment_ids.append(item_id)
-                  usernames.append(user)
-            # print(user, item_id, text)        
+                  usernames.append(user)       
  
     df = pd.DataFrame(list(zip(comment_ids, usernames, filtered_comments)), columns=['comment_ID', 'username', 'comment'])
     df['comment']=df['comment'].apply(str)
@@ -143,7 +142,7 @@ def update_user_scores(new_comments):
 
         # Case: New user
         else:
-            # append user to db
+            # Append user to db
             print(f"About to try appending:\n {this_user, new_comments['sentiment'][ind], 1, new_comments['comment'][ind], new_comments['sentiment'][ind], new_comments['comment_ID'][ind]}")
             cursor.execute(f'''
                             INSERT INTO user_scores (user, avg_score, num_comments, 
@@ -152,9 +151,11 @@ def update_user_scores(new_comments):
                                     "{new_comments['comment'][ind].replace('"',"'")}", {new_comments['sentiment'][ind]}, 
                                     {new_comments['comment_ID'][ind]})
                             ''')
-        conn.commit()    
-    # Stretch
-    # For new_users get_last_30_comments and include in calculations
+            conn.commit()
+            
+            # Get the last 30 posts by this new user, to ensure reasonable avg_sentiment.  
+            update_user_scores(get_user_posts(this_user, limit=30))  
+
     df = pd.read_sql_query('SELECT * FROM user_scores', conn)
     # df = pd.DataFrame(query, columns=['id', 'user', 'avg_score', 'num_comments',
     #                                  'saltiest_comment', 'saltiest_comment_sentiment',
@@ -180,8 +181,7 @@ def get_user_posts(username, filter_posts="comment", limit=100):
     limit (int): The maximum number of posts to return
   
     Returns: 
-    filtered_post_ids (list<int>): Filtered post ids as a list of integers.
-    filtered_posts (list<str>): Filtered post ids as a list of strings.
+    Pandas df['comment_ID', 'username', 'comment', 'sentiment']
   
     """
     # TODO: currently only supports 'comment' type
@@ -215,8 +215,18 @@ def get_user_posts(username, filter_posts="comment", limit=100):
         # Checks whether the specified limit has been reached
         if len(filtered_posts) == limit:
             break
+    
+    usernames = [username] * len(fitered_posts)
 
-    return filtered_post_ids, filtered_posts
+    # Create and refactor df
+    df = pd.DataFrame(list(zip(filetered_post_ids, usernames, filtered_posts)), columns=['comment_ID', 'username', 'comment'])
+    df['comment']=df['comment'].apply(str)
+    df['comment'] = df['comment'].apply(lambda x: remove_html_tags(x))
+    df['comment'] = df['comment'].apply(lambda x: html.unescape(x))
+    df['sentiment'] = df['comment'].apply(lambda x: score_sentiment(x))
+    for i in range(len(df['comment'])):
+        print(df['comment'][i])
+    return df
 
 def get_user_list(criteria='top100'):
     if criteria=='top100':

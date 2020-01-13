@@ -42,6 +42,7 @@ def score_sentiment(tweet):
         }
         response = requests.post(url=url, data=json.dumps(data_dict)) 
         response_dict = json.loads(response.content) 
+        print(response_dict)
         avg_sentiment = response_dict["attributeScores"]["TOXICITY"]["summaryScore"]["value"]
         # for sentence in blob.sentences:
         #         total_sentiment += sentence.sentiment.polarity
