@@ -154,7 +154,7 @@ def update_user_scores(new_comments):
             conn.commit()
             
             # Get the last 30 posts by this new user, to ensure reasonable avg_sentiment.  
-            update_user_scores(get_user_posts(this_user, limit=30))  
+            # update_user_scores(get_user_posts(this_user, limit=30))  
 
     df = pd.read_sql_query('SELECT * FROM user_scores', conn)
     # df = pd.DataFrame(query, columns=['id', 'user', 'avg_score', 'num_comments',
