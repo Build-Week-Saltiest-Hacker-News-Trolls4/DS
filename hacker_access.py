@@ -216,10 +216,10 @@ def get_user_posts(username, filter_posts="comment", limit=100):
         if len(filtered_posts) == limit:
             break
     
-    usernames = [username] * len(fitered_posts)
+    usernames = [username] * len(filtered_posts)
 
     # Create and refactor df
-    df = pd.DataFrame(list(zip(filetered_post_ids, usernames, filtered_posts)), columns=['comment_ID', 'username', 'comment'])
+    df = pd.DataFrame(list(zip(filtered_post_ids, usernames, filtered_posts)), columns=['comment_ID', 'username', 'comment'])
     df['comment']=df['comment'].apply(str)
     df['comment'] = df['comment'].apply(lambda x: remove_html_tags(x))
     df['comment'] = df['comment'].apply(lambda x: html.unescape(x))
