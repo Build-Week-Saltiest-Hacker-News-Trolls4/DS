@@ -110,12 +110,13 @@ def update_user_scores(new_comments):
         
        
         # Case: Existing user
-        if cursor.rowcount > 0:
-            this_user_stats = cursor.fetchall()
-            
+        this_user_stats = cursor.fetchall()
+        if this_user_stats != []:
+            print("EXISTING USER")
+            print("User stats ", this_user_stats)
             # Update avg_score
-            avg_score = this_user_stats[col['avg_score']]
-            num_comments = this_user_stats[col['num_comments']]
+            avg_score = this_user_stats[0][0]
+            num_comments = this_user_stats[0][1]
             this_comment_sentiment = new_comments['sentiment'][ind]
 
             new_avg_score = (avg_score * num_comments + this_comment_sentiment) / (num_comments + 1)
@@ -131,18 +132,21 @@ def update_user_scores(new_comments):
                             ''')
 
             # Update saltiest_comment and saltiest_comment_id if needed
-            if this_comment_sentiment < this_user_stats[col['saltiest_comment_sentiment']]:
+            print("New Comments: __________",new_comments.loc[[ind]])
+            if this_comment_sentiment < this_user_stats[0][3]:
+                print("UPDATE fields: ", new_comments['comment'][ind].replace('"',"'"), new_comments['sentiment'][ind], new_comments['comment_ID'][ind])
                 cursor.execute(f'''
                             UPDATE user_scores
-                            SET saltiest_comment = {new_comments['comment'][ind].replace('"',"'")},
+                            SET saltiest_comment = "{new_comments['comment'][ind].replace('"',"'")}",
                                 saltiest_comment_sentiment = {new_comments['sentiment'][ind]},
                                 saltiest_comment_id = {new_comments['comment_ID'][ind]}
-                            WHERE user = "{this_user}""
+                            WHERE user = "{this_user}"
                             ''')
-
+            conn.commit()
         # Case: New user
         else:
             # Append user to db
+            print("NEW USER")
             print(f"About to try appending:\n {this_user, new_comments['sentiment'][ind], 1, new_comments['comment'][ind], new_comments['sentiment'][ind], new_comments['comment_ID'][ind]}")
             cursor.execute(f'''
                             INSERT INTO user_scores (user, avg_score, num_comments, 
@@ -154,7 +158,8 @@ def update_user_scores(new_comments):
             conn.commit()
             
             # Get the last 30 posts by this new user, to ensure reasonable avg_sentiment.  
-            # update_user_scores(get_user_posts(this_user, limit=30))  
+            historic_posts = get_user_posts(this_user, limit=30)
+            update_user_scores(historic_posts)  
 
     df = pd.read_sql_query('SELECT * FROM user_scores', conn)
     # df = pd.DataFrame(query, columns=['id', 'user', 'avg_score', 'num_comments',
