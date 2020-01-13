@@ -30,6 +30,23 @@ def score_sentiment(tweet):
         filtered_sentence = [w for w in words if w not in stop_words]
         #Convert string into TextBlob
         text = ''.join(filtered_sentence)
+        blob = TextBlob(text)
+        total_sentiment = 0
+        for sentence in blob.sentences:
+            print('--->', sentence.sentiment.polarity)
+            total_sentiment += sentence.sentiment.polarity
+        avg_sentiment = total_sentiment/len(blob.sentences)
+        return avg_sentiment
+
+
+""" Google API only allows for 600 queries per day for free.
+def score_sentiment(tweet):
+        '''Extract sentiment (total and average) from  multi-sentence string, sentence by sentence'''
+        words = word_tokenize(tweet)
+        stop_words = set(stopwords.words('english'))
+        filtered_sentence = [w for w in words if w not in stop_words]
+        #Convert string into TextBlob
+        text = ''.join(filtered_sentence)
         # blob = TextBlob(text)
         # total_sentiment = 0
         api_key = "AIzaSyAnwbBNaqHVuM82djR3-nybIezDsBu-X8Q"
@@ -49,6 +66,7 @@ def score_sentiment(tweet):
         # avg_sentiment = total_sentiment/len(blob.sentences)
         return avg_sentiment
         # ,total_sentiment
+"""
 
 def scale_sentiments(sentiments):
     '''
