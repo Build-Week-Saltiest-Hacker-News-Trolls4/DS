@@ -13,6 +13,7 @@ requests = "*"
 nltk = "*"
 textblob = "*"
 decouple = "*"
+sklearn = "*"
 
 [requires]
 python_version = "3.7"

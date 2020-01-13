@@ -29,39 +29,39 @@ def get_new_comments():
     comment_ids = [] 
     usernames = [] 
     filtered_comments = []
-    
+    print("db: a")
     # Accessing file
     txt_file = open("latest_comment_id.txt","r")
     # Assumes the file contains a single line
     latest_comment_id = int(txt_file.read())
     # Erase old value
     txt_file.close()
-    
+    print("db: b")
     # Write new latest_comment_id value
     txt_file = open("latest_comment_id.txt","w")
     txt_file.write(f'{max_item_id}')
     txt_file.close()
+    print("db: c")
 
     
 
     # Count down from most recent comment id until range limit is reached
 
     for item_id in range(latest_comment_id+1, max_item_id): 
-            
+            print(f"db: d- {item_id}")
             post = requests.get(f'https://hacker-news.firebaseio.com/v0/item/{item_id}.json').json()
             
-            #Get comment text and commenter
+            # Get comment text and commenter
             if (post['type'] == 'comment'):
               comment_id = post.get('id')
               user = post.get('by')
               text = post.get('text') 
               
-              #Text==null if post was deleted
+              # Text==null if post was deleted
               if text:
                   filtered_comments.append(text)
                   comment_ids.append(item_id)
-                  usernames.append(user)
-            # print(user, item_id, text)        
+                  usernames.append(user)       
  
     df = pd.DataFrame(list(zip(comment_ids, usernames, filtered_comments)), columns=['comment_ID', 'username', 'comment'])
     df['comment']=df['comment'].apply(str)
@@ -74,7 +74,9 @@ def get_new_comments():
 
 def update_user_scores(new_comments):
     #Check to see if sqlite3 db exists, if not create it
-    with sqlite3.connect('test.db') as conn:
+    print(f"db: update_user_scores ->\n {new_comments}")
+
+    with sqlite3.connect('users.db') as conn:
         cursor = conn.cursor()
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS user_scores (
@@ -82,7 +84,7 @@ def update_user_scores(new_comments):
         user TEXT NOT NULL,
         avg_score REAL NOT NULL,
         num_comments INTEGER NOT NULL,
-        saltiest_comment TEXT NOT NULL,
+        saltiest_comment BLOB NOT NULL,
         saltiest_comment_sentiment REAL NOT NULL,
         saltiest_comment_id INTEGER NOT NULL)
         ''')
@@ -96,25 +98,25 @@ def update_user_scores(new_comments):
 
     col = {'user':1, 'avg_score':2, 'num_comments':3, 'saltiest_comment':4, 'saltiest_comment_id':5}
     
-    for comment in new_comments:
-        
-        this_user = comment['username']
+    for ind in new_comments.index:
+        print(f"db: update_user_scores -> {new_comments['username'][ind]}")
+        this_user = new_comments['username'][ind]
         
         cursor.execute(f'''
                         SELECT avg_score, num_comments, saltiest_comment, saltiest_comment_sentiment, saltiest_comment_id
                         FROM user_scores
-                        WHERE user={this_user}
+                        WHERE user = "{this_user}" 
                         ''')
         
        
         # Case: Existing user
-        if cursor.rowcount() > 0:
+        if cursor.rowcount > 0:
             this_user_stats = cursor.fetchall()
             
             # Update avg_score
             avg_score = this_user_stats[col['avg_score']]
             num_comments = this_user_stats[col['num_comments']]
-            this_comment_sentiment = comment['sentiment']
+            this_comment_sentiment = new_comments['sentiment'][ind]
 
             new_avg_score = (avg_score * num_comments + this_comment_sentiment) / (num_comments + 1)
 
@@ -125,40 +127,44 @@ def update_user_scores(new_comments):
                             UPDATE user_scores
                             SET avg_score = {new_avg_score},
                                 num_comments = {new_num_comments}
-                            WHERE user = {this_user}
+                            WHERE user = "{this_user}"
                             ''')
 
             # Update saltiest_comment and saltiest_comment_id if needed
             if this_comment_sentiment < this_user_stats[col['saltiest_comment_sentiment']]:
                 cursor.execute(f'''
                             UPDATE user_scores
-                            SET saltiest_comment = {comment['comment']},
-                                saltiest_comment_sentiment = {comment['sentiment']},
-                                saltiest_comment_id = {comment['comment_ID']}
-                            WHERE user = {this_user}
+                            SET saltiest_comment = {new_comments['comment'][ind].replace('"',"'")},
+                                saltiest_comment_sentiment = {new_comments['sentiment'][ind]},
+                                saltiest_comment_id = {new_comments['comment_ID'][ind]}
+                            WHERE user = "{this_user}""
                             ''')
 
         # Case: New user
         else:
-            # append user to db
+            # Append user to db
+            print(f"About to try appending:\n {this_user, new_comments['sentiment'][ind], 1, new_comments['comment'][ind], new_comments['sentiment'][ind], new_comments['comment_ID'][ind]}")
             cursor.execute(f'''
                             INSERT INTO user_scores (user, avg_score, num_comments, 
                                                     saltiest_comment, saltiest_comment_sentiment, saltiest_comment_id)
-                            VALUES({this_user}, {comment['sentiment']}, 1, 
-                                    {comment['comment']}, {comment['sentiment']}, 
-                                    {comment['comment_ID']})
+                            VALUES("{this_user}", {new_comments['sentiment'][ind]}, 1, 
+                                    "{new_comments['comment'][ind].replace('"',"'")}", {new_comments['sentiment'][ind]}, 
+                                    {new_comments['comment_ID'][ind]})
                             ''')
+            conn.commit()
             
-    # Stretch
-    # For new_users get_last_30_comments and include in calculations
-    conn = sqlite3.connect('test.db')
-    query = pd.read_sql_query('SELECT * FROM user_scores', conn)
-    df = pd.DataFrame(query, columns=['id', 'user', 'avg_score', 'num_comments',
-                                      'saltiest_comment', 'saltiest_comment_sentiment',
-                                      'saltiest comment_id'])
+            # Get the last 30 posts by this new user, to ensure reasonable avg_sentiment.  
+            # update_user_scores(get_user_posts(this_user, limit=30))  
+
+    df = pd.read_sql_query('SELECT * FROM user_scores', conn)
+    # df = pd.DataFrame(query, columns=['id', 'user', 'avg_score', 'num_comments',
+    #                                  'saltiest_comment', 'saltiest_comment_sentiment',
+    #                                  'saltiest comment_id'])
     df = df.set_index('id')
-    df['avg_score'] = scale_sentiments(df['avg_score'])
-    return df.sort_by('avg_score', ascending=False)
+    # df['avg_score'] = scale_sentiments(df['avg_score'])
+    print("------\n", df)
+    print("type: ", type(df))
+    return df.sort_values(by='avg_score', ascending=False)
     # return df sorted by saltiness
  
 
@@ -175,8 +181,7 @@ def get_user_posts(username, filter_posts="comment", limit=100):
     limit (int): The maximum number of posts to return
   
     Returns: 
-    filtered_post_ids (list<int>): Filtered post ids as a list of integers.
-    filtered_posts (list<str>): Filtered post ids as a list of strings.
+    Pandas df['comment_ID', 'username', 'comment', 'sentiment']
   
     """
     # TODO: currently only supports 'comment' type
@@ -210,8 +215,18 @@ def get_user_posts(username, filter_posts="comment", limit=100):
         # Checks whether the specified limit has been reached
         if len(filtered_posts) == limit:
             break
+    
+    usernames = [username] * len(filtered_posts)
 
-    return filtered_post_ids, filtered_posts
+    # Create and refactor df
+    df = pd.DataFrame(list(zip(filtered_post_ids, usernames, filtered_posts)), columns=['comment_ID', 'username', 'comment'])
+    df['comment']=df['comment'].apply(str)
+    df['comment'] = df['comment'].apply(lambda x: remove_html_tags(x))
+    df['comment'] = df['comment'].apply(lambda x: html.unescape(x))
+    df['sentiment'] = df['comment'].apply(lambda x: score_sentiment(x))
+    for i in range(len(df['comment'])):
+        print(df['comment'][i])
+    return df
 
 def get_user_list(criteria='top100'):
     if criteria=='top100':

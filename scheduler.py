@@ -9,7 +9,7 @@ def api_access():
     main_process()
     print('This job is run every day.')
 
-@sched.scheduled_job('interval', minutes=5)
+@sched.scheduled_job('interval', minutes=1)
 def api_access_test():
     main_process()
     print('This job is run every day.')

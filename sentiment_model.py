@@ -25,6 +25,14 @@ nltk.download()'''
 
 def score_sentiment(tweet):
         '''Extract sentiment (total and average) from  multi-sentence string, sentence by sentence'''
+        text = tweet
+        blob = TextBlob(text)
+        return blob.sentiment.polarity
+
+
+""" Google API only allows for 600 queries per day for free.
+def score_sentiment(tweet):
+        '''Extract sentiment (total and average) from  multi-sentence string, sentence by sentence'''
         words = word_tokenize(tweet)
         stop_words = set(stopwords.words('english'))
         filtered_sentence = [w for w in words if w not in stop_words]
@@ -42,12 +50,14 @@ def score_sentiment(tweet):
         }
         response = requests.post(url=url, data=json.dumps(data_dict)) 
         response_dict = json.loads(response.content) 
+        print(response_dict)
         avg_sentiment = response_dict["attributeScores"]["TOXICITY"]["summaryScore"]["value"]
         # for sentence in blob.sentences:
         #         total_sentiment += sentence.sentiment.polarity
         # avg_sentiment = total_sentiment/len(blob.sentences)
         return avg_sentiment
         # ,total_sentiment
+"""
 
 def scale_sentiments(sentiments):
     '''
