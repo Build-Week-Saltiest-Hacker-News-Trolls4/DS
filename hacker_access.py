@@ -29,26 +29,22 @@ def get_new_comments():
     comment_ids = [] 
     usernames = [] 
     filtered_comments = []
-    print("db: a")
     # Accessing file
     txt_file = open("latest_comment_id.txt","r")
     # Assumes the file contains a single line
     latest_comment_id = int(txt_file.read())
     # Erase old value
     txt_file.close()
-    print("db: b")
     # Write new latest_comment_id value
     txt_file = open("latest_comment_id.txt","w")
     txt_file.write(f'{max_item_id}')
     txt_file.close()
-    print("db: c")
 
     
 
     # Count down from most recent comment id until range limit is reached
 
     for item_id in range(latest_comment_id+1, max_item_id): 
-            print(f"db: d- {item_id}")
             post = requests.get(f'https://hacker-news.firebaseio.com/v0/item/{item_id}.json').json()
             
             # Get comment text and commenter
@@ -68,14 +64,10 @@ def get_new_comments():
     df['comment'] = df['comment'].apply(lambda x: remove_html_tags(x))
     df['comment'] = df['comment'].apply(lambda x: html.unescape(x))
     df['sentiment'] = df['comment'].apply(lambda x: score_sentiment(x))
-    for i in range(len(df['comment'])):
-        print(df['comment'][i])
     return df
 
 def update_user_scores(new_comments):
     #Check to see if sqlite3 db exists, if not create it
-    print(f"db: update_user_scores ->\n {new_comments}")
-
     with sqlite3.connect('users.db') as conn:
         cursor = conn.cursor()
         cursor.execute('''
@@ -99,7 +91,6 @@ def update_user_scores(new_comments):
     col = {'user':1, 'avg_score':2, 'num_comments':3, 'saltiest_comment':4, 'saltiest_comment_id':5}
     
     for ind in new_comments.index:
-        print(f"db: update_user_scores -> {new_comments['username'][ind]}")
         this_user = new_comments['username'][ind]
         
         cursor.execute(f'''
@@ -112,8 +103,6 @@ def update_user_scores(new_comments):
         # Case: Existing user
         this_user_stats = cursor.fetchall()
         if this_user_stats != []:
-            print("EXISTING USER")
-            print("User stats ", this_user_stats)
             # Update avg_score
             avg_score = this_user_stats[0][0]
             num_comments = this_user_stats[0][1]
@@ -132,9 +121,7 @@ def update_user_scores(new_comments):
                             ''')
 
             # Update saltiest_comment and saltiest_comment_id if needed
-            print("New Comments: __________",new_comments.loc[[ind]])
             if this_comment_sentiment < this_user_stats[0][3]:
-                print("UPDATE fields: ", new_comments['comment'][ind].replace('"',"'"), new_comments['sentiment'][ind], new_comments['comment_ID'][ind])
                 cursor.execute(f'''
                             UPDATE user_scores
                             SET saltiest_comment = "{new_comments['comment'][ind].replace('"',"'")}",
@@ -146,8 +133,6 @@ def update_user_scores(new_comments):
         # Case: New user
         else:
             # Append user to db
-            print("NEW USER")
-            print(f"About to try appending:\n {this_user, new_comments['sentiment'][ind], 1, new_comments['comment'][ind], new_comments['sentiment'][ind], new_comments['comment_ID'][ind]}")
             cursor.execute(f'''
                             INSERT INTO user_scores (user, avg_score, num_comments, 
                                                     saltiest_comment, saltiest_comment_sentiment, saltiest_comment_id)
@@ -167,8 +152,6 @@ def update_user_scores(new_comments):
     #                                  'saltiest comment_id'])
     df = df.set_index('id')
     # df['avg_score'] = scale_sentiments(df['avg_score'])
-    print("------\n", df)
-    print("type: ", type(df))
     return df.sort_values(by='avg_score', ascending=False)
     # return df sorted by saltiness
  
@@ -229,119 +212,4 @@ def get_user_posts(username, filter_posts="comment", limit=100):
     df['comment'] = df['comment'].apply(lambda x: remove_html_tags(x))
     df['comment'] = df['comment'].apply(lambda x: html.unescape(x))
     df['sentiment'] = df['comment'].apply(lambda x: score_sentiment(x))
-    for i in range(len(df['comment'])):
-        print(df['comment'][i])
     return df
-
-def get_user_list(criteria='top100'):
-    if criteria=='top100':
-        users_string = '''tptacek	sd
-                        2.	jacquesm	sd
-                        3.	patio11	sd
-                        4.	danso	sd
-                        5.	ingve	sd
-                        6.	ColinWright	sd
-                        7.	rayiner	sd
-                        8.	ChuckMcM	sd
-                        9.	rbanffy	sd
-                        10.	prostoalex	sd
-                        11. Animats	79907
-                        12.	mikeash	74346
-                        13.	edw519	73178
-                        14.	jgrahamc	71990
-                        15.	JumpCrisscross	71683
-                        16.	dragonwriter	68034
-                        17.	TeMPOraL	67554
-                        18.	steveklabnik	67203
-                        19.	uptown	66695
-                        20.	shawndumas	66398
-                        21.	nostrademons	63728
-                        22.	luu	63128
-                        23.	jerf	62527
-                        24.	anigbrowl	61255
-                        25.	coldtea	60694
-                        26.	llambda	58088
-                        27.	fogus	56893
-                        28.	Tomte	55753
-                        29.	jrockway	54930
-                        30.	jseliger	54593
-                        31.	pjc50	53735
-                        32.	aaronbrethorst	53634
-                        33.	cperciva	52499
-                        34.	adamnemecek	52486
-                        35.	davidw	52403
-                        36.	pseudolus	52078
-                        37.	DanBC	51403
-                        38.	lelf	51133
-                        39.	dnetesn	50649
-                        40.	tosh	50647
-                        41.	pjmlp	50620
-                        42.	jonbaer	50451
-                        43.	smacktoward	49551
-                        44.	icebraining	47671
-                        45.	coloneltcb	47628
-                        46.	bane	46130
-                        47.	wallflower	45600
-                        48.	evo_9	45514
-                        49.	nkurz	45305
-                        50.	robin_reala	44759
-                        51.	sp332	44413
-                        52.	protomyth	43336
-                        53.	wglb	43152
-                        54.	walterbell	42181
-                        55.	DanielBMarkham	42018
-                        56.	untog	41473
-                        57.	masklinn	41465
-                        58.	userbinator	41398
-                        59.	DiabloD3	40939
-                        60.	petercooper	40624
-                        61.	minimaxir	40221
-                        62.	StavrosK	40031
-                        63.	_delirium	39962
-                        64.	signa11	39552
-                        65.	btilly	39454
-                        66.	zdw	38199
-                        67.	grellas	37716
-                        68.	bpierre	37253
-                        69.	pavel_lishin	37120
-                        70.	lisper	36755
-                        71.	rdl	36589
-                        72.	sethbannon	36380
-                        73.	pcwalton	36356
-                        74.	rdtsc	36352
-                        75.	brudgers	35987
-                        76.	stcredzero	35499
-                        77.	toomuchtodo	35499
-                        78.	pmoriarty	35443
-                        79.	mpweiher	34665
-                        80.	derefr	34356
-                        81.	JoshTriplett	34267
-                        82.	noonespecial	33911
-                        83.	adventured	33881
-                        84.	Garbage	33417
-                        85.	jedberg	33101
-                        86.	Retric	33100
-                        87.	mtgx	33090
-                        88.	sohkamyung	32766
-                        89.	SwellJoe	32631
-                        90.	Anon84	32493
-                        91.	jonknee	32481
-                        92.	cpeterso	32282
-                        93.	wpietri	31987
-                        94.	Someone1234	31715
-                        95.	dredmorbius	31604
-                        96.	scott_s	31496
-                        97.	ilamont	30390
-                        98.	nostromo	30147
-                        99.	gruseom	30044
-                        100.	philwelch	30032
-                        '''
-        # Debug code
-        input_list = users_string.split()
-        user_list = []
-        # Generates indices from 0 on in intervals of 3
-        user_indices = list(range(100))[0::3]
-        for i in user_indices:
-            user_list.append(input_list[i])
-        
-        return user_list
